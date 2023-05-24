@@ -1,11 +1,16 @@
+import os
 import requests
 import csv
 from bs4 import BeautifulSoup
+from stock_find import stock_list
 
-def get_stock_price(stock_codes):
-    for stock_code in stock_codes:
-        url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=html&date=&stockNo={stock_code}"
+def get_stock_price(stock_list):
+    for stock_list in stock_list:
+        url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=html&date=&stockNo={stock_list}"
         
+        # 存進的資料夾
+        directory = "stock_data"
+
         # 發送 GET 請求取得網頁內容
         response = requests.get(url)
         
@@ -38,10 +43,13 @@ def get_stock_price(stock_codes):
             data.append([date, closing_price])
         
         # 建立檔案名稱
-        filename = f"stock_{stock_code}.csv"
+        filename = f"stock_{stock_list}.csv"
+
+        # 建立檔案路徑
+        file_path = os.path.join(directory, filename)
         
         # 寫入 CSV 檔案
-        with open(filename, "w", newline="", encoding="utf-8") as file:
+        with open(file_path, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["日期", "收盤價"])  # 寫入標題欄位
             writer.writerows(data)  # 寫入資料
@@ -49,5 +57,4 @@ def get_stock_price(stock_codes):
         print(f"資料已儲存至 {filename} 檔案中。")
 
 # 測試程式碼
-stock_codes = ["2330", "2317", "2454"]  # 台積電、鴻海、聯發科股票代號
-get_stock_price(stock_codes)
+get_stock_price(stock_list)
